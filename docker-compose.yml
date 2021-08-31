@@ -25,6 +25,7 @@ services:
       PYTHONUNBUFFERED: 1
     ports:
       - "8000:8000"
+      - "34404:34404"
     volumes:
       - .:/usr/src/app
 

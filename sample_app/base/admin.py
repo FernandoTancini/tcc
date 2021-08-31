@@ -11,8 +11,14 @@ class DogAdmin(admin.ModelAdmin):
         autocomplete_fields = ['to_dog']
         fk_name = 'from_dog'
         extra = 0
+    class VaccinesInline(admin.StackedInline):
+        model = models.Dog.vaccines.through
+        verbose_name = 'vaccine'
+        verbose_name_plural = 'vaccines'
+        autocomplete_fields = ['vaccine']
+        extra = 0
 
-    inlines = [FriendsInline]
+    inlines = [FriendsInline, VaccinesInline]
     search_fields = ['name']
     fields = ['name', 'age', 'owner']
     list_display = ['name', 'age', 'owner']

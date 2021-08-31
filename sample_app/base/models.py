@@ -11,6 +11,10 @@ class Dog(models.Model):
     age = models.PositiveSmallIntegerField('age')
     dog_friends = models.ManyToManyField('base.Dog', verbose_name='dog friends')
     owner = models.ForeignKey('auth.User', deletion.CASCADE, verbose_name='owner', related_name='owned_dogs')
+    vaccines = models.ManyToManyField('base.Vaccine', verbose_name='vacinas')
+
+    def __str__(self):
+        return f'{self.name} ({self.pk})'
 
 
 class Vaccine(models.Model):
@@ -21,6 +25,9 @@ class Vaccine(models.Model):
     name = models.CharField('name', max_length=255)
     covered_diseases = models.ManyToManyField('base.Disease', verbose_name='dog friends')
 
+    def __str__(self):
+        return f'{self.name} ({self.pk})'
+
 
 class Disease(models.Model):
     class Meta:
@@ -28,4 +35,7 @@ class Disease(models.Model):
         verbose_name_plural = 'diseases'
 
     name = models.CharField('name', max_length=255)
+
+    def __str__(self):
+        return f'{self.name} ({self.pk})'
 
