@@ -13,10 +13,14 @@
             "pathMappings": [
                 {
                     "localRoot": "${workspaceFolder}/sample_app",
-                    "remoteRoot": "."
+                    "remoteRoot": "sample_app"
+                },
+                {
+                    "localRoot": "${workspaceFolder}/graphene-django",
+                    "remoteRoot": "graphene-django"
                 }
             ],
-            "justMyCode": true
+            "justMyCode": false
         }
     ]
 }

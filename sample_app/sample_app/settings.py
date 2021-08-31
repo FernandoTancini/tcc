@@ -50,24 +50,16 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'base.middlewares.MonitorMiddleware',
 ]
 
 GRAPHENE = {
     "SCHEMA": "sample_app.schema.schema",
     "MIDDLEWARE": (
         "graphene_django.debug.DjangoDebugMiddleware",
-        'graphql_jwt.middleware.JSONWebTokenMiddleware',
     )
 }
 
-AUTHENTICATION_BACKENDS = [
-    'graphql_jwt.backends.JSONWebTokenBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-GRAPHQL_JWT = {
-    'JWT_VERIFY_EXPIRATION': False,
-}
 
 ROOT_URLCONF = "sample_app.urls"
 

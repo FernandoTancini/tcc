@@ -3,7 +3,6 @@ from base.models import Disease, Dog, Vaccine
 from django.contrib.auth.models import User
 from graphene_django.debug import DjangoDebug
 from graphene_django.types import DjangoObjectType
-from graphql_jwt.decorators import login_required
 
 
 class UserType(DjangoObjectType):
@@ -34,9 +33,12 @@ class Query(graphene.ObjectType):
     debug = graphene.Field(DjangoDebug, name="_debug")
     profile = graphene.Field(UserType)
 
-    @login_required
     def resolve_profile(root, info):
-        return info.context.user
+        return UserType.prepare(info.context.user, info.field_nodes[0], info)
+        # return info.context.user
+
+        # users_qs = User.objects.all().prefetch_related('owned_dogs__dog_friends__vaccines__covered_diseases')
+        # return users_qs.get(pk=info.context.user.pk)
 
 
 schema = graphene.Schema(query=Query)
