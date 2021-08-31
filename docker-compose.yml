@@ -1,9 +1,20 @@
 version: '3.7'
 
 services:
+  db:
+    image: postgres:9.6
+    container_name: tcc-db
+    restart: "no"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
   api:
     image: python:3.8
-    container_name: api
+    container_name: tcc-api
     restart: "no"
     working_dir: /usr/src/app
     command: bash -c "(cd graphene-django && make dev-setup) &&
@@ -16,3 +27,6 @@ services:
       - "8000:8000"
     volumes:
       - .:/usr/src/app
+
+volumes:
+  db-data:
