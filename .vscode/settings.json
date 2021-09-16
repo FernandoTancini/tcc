@@ -2,4 +2,8 @@
     "files.exclude": {
       "**/__pycache__": true,
     },
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+      "graphene-django/graphene_django",
+    ],
 }

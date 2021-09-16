@@ -34,8 +34,8 @@ class Query(graphene.ObjectType):
     profile = graphene.Field(UserType)
 
     def resolve_profile(root, info):
-        return UserType.prepare(info.context.user, info.field_nodes[0], info)
-        # return info.context.user
+        # return UserType.prepare(info.context.user, info.field_nodes[0], info)
+        return info.context.user
 
         # users_qs = User.objects.all().prefetch_related('owned_dogs__dog_friends__vaccines__covered_diseases')
         # return users_qs.get(pk=info.context.user.pk)
