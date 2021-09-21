@@ -1,6 +1,9 @@
+from graphene_django.schema import DjangoSchema
+from django.db.models.fields import BooleanField
 import graphene
 from base.models import Disease, Dog, Vaccine
 from django.contrib.auth.models import User
+from django.db.models import Value
 from graphene_django.debug import DjangoDebug
 from graphene_django.types import DjangoObjectType
 
@@ -15,6 +18,10 @@ class DogType(DjangoObjectType):
     class Meta:
         model = Dog
         fields = ['name', 'age', 'dog_friends', 'vaccines']
+
+    is_pretty = graphene.Boolean()
+    def annotate_is_pretty(qs, _info):
+        return qs.annotate(is_pretty=Value(True, output_field=BooleanField()))
 
 
 class VaccineType(DjangoObjectType):
@@ -34,11 +41,7 @@ class Query(graphene.ObjectType):
     profile = graphene.Field(UserType)
 
     def resolve_profile(root, info):
-        # return UserType.prepare(info.context.user, info.field_nodes[0], info)
         return info.context.user
 
-        # users_qs = User.objects.all().prefetch_related('owned_dogs__dog_friends__vaccines__covered_diseases')
-        # return users_qs.get(pk=info.context.user.pk)
 
-
-schema = graphene.Schema(query=Query)
+schema = DjangoSchema(query=Query)
