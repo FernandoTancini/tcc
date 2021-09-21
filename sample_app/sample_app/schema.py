@@ -23,6 +23,10 @@ class DogType(DjangoObjectType):
     def annotate_is_pretty(qs, _info):
         return qs.annotate(is_pretty=Value(True, output_field=BooleanField()))
 
+    is_prettyy = graphene.NonNull(graphene.List(graphene.NonNull(graphene.Boolean)))
+    def resolve_is_prettyy(self, _info):
+        return [True, False]
+
 
 class VaccineType(DjangoObjectType):
     class Meta:
