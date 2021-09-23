@@ -4,6 +4,12 @@
     },
     "python.testing.pytestEnabled": true,
     "python.testing.pytestArgs": [
-      "graphene-django/examples",
+      "graphene-django/graphene_django",
+    ],
+    "python.autoComplete.extraPaths": [
+      "./sample_app",
+    ],
+    "python.analysis.extraPaths": [
+        "./sample_app"
     ],
 }
