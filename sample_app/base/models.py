@@ -24,6 +24,7 @@ class Vaccine(models.Model):
 
     name = models.CharField('name', max_length=255)
     covered_diseases = models.ManyToManyField('base.Disease', verbose_name='dog friends')
+    manufacturer_country = models.ForeignKey('base.Country', deletion.SET_NULL, null=True, verbose_name='manufacturer country', related_name='+')
 
     def __str__(self):
         return f'{self.name} ({self.pk})'
@@ -35,7 +36,36 @@ class Disease(models.Model):
         verbose_name_plural = 'diseases'
 
     name = models.CharField('name', max_length=255)
+    origin_country = models.ForeignKey('base.Country', deletion.SET_NULL, null=True, verbose_name='origin country', related_name='+')
 
     def __str__(self):
         return f'{self.name} ({self.pk})'
 
+
+class Country(models.Model):
+    class Meta:
+        verbose_name = 'country'
+        verbose_name_plural = 'countries'
+
+    name = models.CharField('name', max_length=255)
+
+    def __str__(self):
+        return f'{self.name} ({self.pk})'
+
+
+class Infection(models.Model):
+    class Meta:
+        verbose_name = 'infection'
+        verbose_name_plural = 'infections'
+
+    lethal = models.BooleanField('lethal')
+    disease = models.ForeignKey('base.Disease', deletion.CASCADE, verbose_name='disease', related_name='infections')
+
+
+class VaccineResearch(models.Model):
+    class Meta:
+        verbose_name = 'vaccine research'
+        verbose_name_plural = 'vaccine researches'
+
+    effectiveness = models.DecimalField('effectiveness', decimal_places=4, max_digits=5)
+    vaccine = models.ForeignKey('base.Vaccine', deletion.CASCADE, verbose_name='VACCINE', related_name='researches')

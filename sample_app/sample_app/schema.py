@@ -1,15 +1,11 @@
 import graphene
-from base.models import Disease, Dog, Vaccine
+from base.controllers import annotate_effectiveness, annotate_lethality
+from base.models import Country, Disease, Dog, Vaccine
 from django.contrib.auth.models import User
-from django.db.models import Value
-from django.db.models.fields import BooleanField
-# from graphene.relay import Node
 from graphene_django.debug import DjangoDebug
-# from graphene_django.fields import DjangoConnectionField
-# from graphene_django.filter.fields import DjangoFilterConnectionField
 from graphene_django.schema import DjangoSchema
 from graphene_django.types import DjangoObjectType
-    
+
 
 class DogType(DjangoObjectType):
     class Meta:
@@ -26,12 +22,33 @@ class UserType(DjangoObjectType):
 class VaccineType(DjangoObjectType):
     class Meta:
         model = Vaccine
-        fields = ['name', 'covered_diseases']
+        fields = ['name', 'covered_diseases', 'manufacturer_country']
+
+    effectiveness = graphene.Float()
+    def annotate_effectiveness(root_qs, info):
+        return annotate_effectiveness(root_qs)
+
+    # def resolve_effectiveness(root, info):
+    #     return root.researches.aggregate(avg=Avg('effectiveness'))['avg']
 
 
 class DiseaseType(DjangoObjectType):
     class Meta:
         model = Disease
+        fields = ['name', 'origin_country']
+
+    lethality = graphene.Float()
+    def annotate_lethality(root_qs, info):
+        return annotate_lethality(root_qs)
+
+    # def resolve_lethality(root, info):
+    #     return root.infections.filter(lethal=True).count() / root.infections.all().count()
+
+
+
+class CountryType(DjangoObjectType):
+    class Meta:
+        model = Country
         fields = ['name']
 
 
@@ -44,3 +61,4 @@ class Query(graphene.ObjectType):
 
 
 schema = DjangoSchema(query=Query, automatic_preparation=True)
+# schema = DjangoSchema(query=Query)
