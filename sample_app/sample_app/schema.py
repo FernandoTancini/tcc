@@ -2,6 +2,7 @@ import graphene
 from base.controllers import annotate_effectiveness, annotate_lethality
 from base.models import Country, Disease, Dog, Vaccine
 from django.contrib.auth.models import User
+from django.db.models.aggregates import Avg
 from graphene_django.debug import DjangoDebug
 from graphene_django.schema import DjangoSchema
 from graphene_django.types import DjangoObjectType
