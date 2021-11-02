@@ -1,71 +1,45 @@
 from django.db import models
 from django.db.models import deletion
 
+from base import enums
 
-class Dog(models.Model):
+class Profile(models.Model):
     class Meta:
-        verbose_name = 'dog'
-        verbose_name_plural = 'dogs'
-
-    name = models.CharField('name', max_length=255)
-    age = models.PositiveSmallIntegerField('age')
-    dog_friends = models.ManyToManyField('base.Dog', verbose_name='dog friends')
-    owner = models.ForeignKey('auth.User', deletion.CASCADE, verbose_name='owner', related_name='owned_dogs')
-    vaccines = models.ManyToManyField('base.Vaccine', verbose_name='vacinas')
-
-    def __str__(self):
-        return f'{self.name} ({self.pk})'
-
-
-class Vaccine(models.Model):
-    class Meta:
-        verbose_name = 'vaccine'
-        verbose_name_plural = 'vaccines'
-
-    name = models.CharField('name', max_length=255)
-    covered_diseases = models.ManyToManyField('base.Disease', verbose_name='dog friends')
-    manufacturer_country = models.ForeignKey('base.Country', deletion.SET_NULL, null=True, verbose_name='manufacturer country', related_name='+')
-
-    def __str__(self):
-        return f'{self.name} ({self.pk})'
-
-
-class Disease(models.Model):
-    class Meta:
-        verbose_name = 'disease'
-        verbose_name_plural = 'diseases'
-
-    name = models.CharField('name', max_length=255)
-    origin_country = models.ForeignKey('base.Country', deletion.SET_NULL, null=True, verbose_name='origin country', related_name='+')
-
-    def __str__(self):
-        return f'{self.name} ({self.pk})'
-
-
-class Country(models.Model):
-    class Meta:
-        verbose_name = 'country'
-        verbose_name_plural = 'countries'
+        verbose_name = 'profile'
+        verbose_name_plural = 'profiles'
 
     name = models.CharField('name', max_length=255)
 
-    def __str__(self):
-        return f'{self.name} ({self.pk})'
-
-
-class Infection(models.Model):
+class Post(models.Model):
     class Meta:
-        verbose_name = 'infection'
-        verbose_name_plural = 'infections'
+        verbose_name = 'social interaction'
+        verbose_name_plural = 'social interactions'
 
-    lethal = models.BooleanField('lethal')
-    disease = models.ForeignKey('base.Disease', deletion.CASCADE, verbose_name='disease', related_name='infections')
+    profile = models.ForeignKey('base.Profile', deletion.CASCADE, verbose_name='profile', related_name='posts')
+
+    date = models.DateField('date')
+    text = models.CharField('text', max_length=255)
 
 
-class VaccineResearch(models.Model):
+class Comment(models.Model):
     class Meta:
-        verbose_name = 'vaccine research'
-        verbose_name_plural = 'vaccine researches'
+        verbose_name = 'comment'
+        verbose_name_plural = 'comments'
 
-    effectiveness = models.DecimalField('effectiveness', decimal_places=4, max_digits=5)
-    vaccine = models.ForeignKey('base.Vaccine', deletion.CASCADE, verbose_name='VACCINE', related_name='researches')
+    post = models.ForeignKey('base.Post', deletion.CASCADE, verbose_name='post', related_name='comments')
+    profile = models.ForeignKey('base.Profile', deletion.CASCADE, verbose_name='profile', related_name='comments')
+
+    date = models.DateField('date')
+    text = models.CharField('text', max_length=255)
+
+
+class CommentReaction(models.Model):
+    class Meta:
+        verbose_name = 'comment reaction'
+        verbose_name_plural = 'comment reactions'
+
+    comment = models.ForeignKey('base.Comment', deletion.CASCADE, verbose_name='comment', related_name='reactions')
+    profile = models.ForeignKey('base.Profile', deletion.CASCADE, verbose_name='profile', related_name='reactions')
+
+    date = models.DateField('date')
+    kind = models.CharField('kind', max_length=255, choices=enums.ReactionKind.to_choices())

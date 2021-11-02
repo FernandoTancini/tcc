@@ -1,8 +1,9 @@
-import random
-from django.core.management.base import BaseCommand
+from base import enums
+from base.models import Comment, CommentReaction, Post, Profile
 from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+from django.utils import timezone
 
-from base.models import Country, Disease, Dog, Infection, Vaccine, VaccineResearch
 
 class Command(BaseCommand):
     help = 'Create db initial data'
@@ -12,51 +13,29 @@ class Command(BaseCommand):
         if not admin_user:
             admin_user = User.objects.create_superuser('admin', 'admin@example.com', 'adm')
 
-        country = Country.objects.create(name='Country')
+        posts = []
+        profiles = []
+        for i in range(16):
+            profile = Profile.objects.create(name=f'Profile {i}')
+            profiles.append(profile)
 
-        dogs = []
-        for i in range(10):
-            dog = Dog.objects.create(
-                name    = f'Dog {i}',
-                age     = i,
-                owner   = admin_user)
-            dogs.append(dog)
+            post = Post.objects.create(
+                profile = profile,
+                date    = timezone.now(),
+                text    = f'Text from Post {i}')
+            posts.append(post)
 
-        vaccines = []
-        for i in range(5):
-            vaccine = Vaccine.objects.create(
-                name                    = f'Vaccine {i}',
-                manufacturer_country    = country)
-            vaccines.append(vaccine)
+        for post in posts:
+            for profile in profiles:
+                comment = Comment.objects.create(
+                    post    = post,
+                    profile = profile,
+                    date    = timezone.now(),
+                    text    = f'Text from comment of {profile.name} in post of id {post.pk}')
 
-            vaccine_researches = []
-            for _ in range(100):
-                vaccine_researches.append(
-                    VaccineResearch(vaccine=vaccine, effectiveness=random.choice([0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95])))
-            VaccineResearch.objects.bulk_create(vaccine_researches)
-
-        diseases = []
-        for i in range(3):
-            disease = Disease.objects.create(
-                name            = f'Disease {i}',
-                origin_country  = country)
-            diseases.append(disease)
-
-            infections = []
-            for _ in range(100):
-                infections.append(
-                    Infection(disease=disease, lethal=random.choice([False, True, True, True, True, True])))
-            Infection.objects.bulk_create(infections)
-
-        # m2m fields
-
-        for dog in dogs:
-            other_dogs = [d for d in dogs if d != dog]
-            dog.dog_friends.add(*other_dogs)
-
-        for dog in dogs:
-            dog.vaccines.add(*vaccines)
-
-        for vaccine in vaccines:
-            vaccine.covered_diseases.add(*diseases)
-
+                for _profile in profiles:
+                    CommentReaction.objects.create(
+                        comment = comment,
+                        profile = _profile,
+                        date    = timezone.now(),
+                        kind    = enums.ReactionKind.LIKE.name)

@@ -1,6 +1,5 @@
 import graphene
-from base.controllers import annotate_effectiveness, annotate_lethality
-from base.models import Country, Disease, Dog, Vaccine
+from base.models import Comment, CommentReaction, Post, Profile
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg
 from graphene_django.debug import DjangoDebug
@@ -8,58 +7,39 @@ from graphene_django.schema import DjangoSchema
 from graphene_django.types import DjangoObjectType
 
 
-class DogType(DjangoObjectType):
+class ProfileType(DjangoObjectType):
     class Meta:
-        model = Dog
-        fields = ['name', 'age', 'dog_friends', 'vaccines']
-
-
-class UserType(DjangoObjectType):
-    class Meta:
-        model = User
-        fields = ['owned_dogs']
-
-
-class VaccineType(DjangoObjectType):
-    class Meta:
-        model = Vaccine
-        fields = ['name', 'covered_diseases', 'manufacturer_country']
-
-    effectiveness = graphene.Float()
-    def annotate_effectiveness(root_qs, info):
-        return annotate_effectiveness(root_qs)
-
-    # def resolve_effectiveness(root, info):
-    #     return root.researches.aggregate(avg=Avg('effectiveness'))['avg']
-
-
-class DiseaseType(DjangoObjectType):
-    class Meta:
-        model = Disease
-        fields = ['name', 'origin_country']
-
-    lethality = graphene.Float()
-    def annotate_lethality(root_qs, info):
-        return annotate_lethality(root_qs)
-
-    # def resolve_lethality(root, info):
-    #     return root.infections.filter(lethal=True).count() / root.infections.all().count()
-
-
-
-class CountryType(DjangoObjectType):
-    class Meta:
-        model = Country
+        model = Profile
         fields = ['name']
+
+
+class PostType(DjangoObjectType):
+    class Meta:
+        model = Post
+        fields = ['date', 'text', 'profile', 'comments']
+
+
+class CommentType(DjangoObjectType):
+    class Meta:
+        model = Comment
+        fields = ['date', 'text', 'profile', 'reactions']
+
+
+class CommentReactionType(DjangoObjectType):
+    class Meta:
+        model = CommentReaction
+        fields = ['date', 'kind', 'profile']
 
 
 class Query(graphene.ObjectType):
     debug = graphene.Field(DjangoDebug, name="_debug")
-    user = graphene.Field(UserType)
+    feed_posts = graphene.List(
+        PostType,
+        offset=graphene.Int(required=True),
+        limit=graphene.Int(required=True))
 
-    def resolve_user(root, info):
-        return info.context.user
+    def resolve_feed_posts(root, info, offset, limit):
+        return Post.objects.all()[offset:limit]
 
 
-schema = DjangoSchema(query=Query, automatic_preparation=True)
-# schema = DjangoSchema(query=Query)
+schema = DjangoSchema(query=Query, automatic_preparation=False)
