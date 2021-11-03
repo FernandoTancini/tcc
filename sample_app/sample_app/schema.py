@@ -1,11 +1,10 @@
+from django.db.models.expressions import OuterRef, Subquery
 import graphene
 from base.models import Comment, CommentReaction, Post, Profile
-from django.contrib.auth.models import User
-from django.db.models.aggregates import Avg
 from graphene_django.debug import DjangoDebug
 from graphene_django.schema import DjangoSchema
 from graphene_django.types import DjangoObjectType
-
+from base.controllers import annotate_is_bully
 
 class ProfileType(DjangoObjectType):
     class Meta:
@@ -30,6 +29,20 @@ class CommentReactionType(DjangoObjectType):
         model = CommentReaction
         fields = ['date', 'kind', 'profile']
 
+    is_from_bully = graphene.Boolean()
+
+    def resolve_is_from_bully(root, info):
+        profile_qs = Profile.objects.filter(pk=root.profile_id)
+        is_from_bully = annotate_is_bully(profile_qs).first().is_bully
+
+        return is_from_bully
+
+    # def annotate_is_from_bully(queryset, info):
+    #     profile_qs = Profile.objects.filter(pk=OuterRef('profile'))
+    #     is_from_bully = annotate_is_bully(profile_qs).values('is_bully')
+
+    #     return queryset.annotate(is_from_bully=Subquery(is_from_bully))
+
 
 class Query(graphene.ObjectType):
     debug = graphene.Field(DjangoDebug, name="_debug")
@@ -42,4 +55,5 @@ class Query(graphene.ObjectType):
         return Post.objects.all()[offset:limit]
 
 
-schema = DjangoSchema(query=Query, automatic_preparation=False)
+schema = DjangoSchema(query=Query)
+# schema = DjangoSchema(query=Query, automatic_preparation=True)

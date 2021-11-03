@@ -15,7 +15,7 @@ class Post(models.Model):
         verbose_name = 'social interaction'
         verbose_name_plural = 'social interactions'
 
-    profile = models.ForeignKey('base.Profile', deletion.CASCADE, verbose_name='profile', related_name='posts')
+    profile = models.ForeignKey('base.Profile', deletion.CASCADE, related_name='posts')
 
     date = models.DateField('date')
     text = models.CharField('text', max_length=255)
@@ -26,8 +26,8 @@ class Comment(models.Model):
         verbose_name = 'comment'
         verbose_name_plural = 'comments'
 
-    post = models.ForeignKey('base.Post', deletion.CASCADE, verbose_name='post', related_name='comments')
-    profile = models.ForeignKey('base.Profile', deletion.CASCADE, verbose_name='profile', related_name='comments')
+    post = models.ForeignKey('base.Post', deletion.CASCADE, related_name='comments')
+    profile = models.ForeignKey('base.Profile', deletion.CASCADE, related_name='comments')
 
     date = models.DateField('date')
     text = models.CharField('text', max_length=255)
@@ -38,8 +38,8 @@ class CommentReaction(models.Model):
         verbose_name = 'comment reaction'
         verbose_name_plural = 'comment reactions'
 
-    comment = models.ForeignKey('base.Comment', deletion.CASCADE, verbose_name='comment', related_name='reactions')
-    profile = models.ForeignKey('base.Profile', deletion.CASCADE, verbose_name='profile', related_name='reactions')
+    comment = models.ForeignKey('base.Comment', deletion.CASCADE, related_name='reactions')
+    profile = models.ForeignKey('base.Profile', deletion.CASCADE, related_name='reactions')
 
     date = models.DateField('date')
     kind = models.CharField('kind', max_length=255, choices=enums.ReactionKind.to_choices())
