@@ -1,5 +1,6 @@
 from django.db.models.expressions import OuterRef, Subquery
 import graphene
+from graphene.types.schema import Schema
 from base.models import Comment, CommentReaction, Post, Profile
 from graphene_django.debug import DjangoDebug
 from graphene_django.schema import DjangoSchema
@@ -55,5 +56,5 @@ class Query(graphene.ObjectType):
         return Post.objects.all()[offset:limit]
 
 
-# schema = DjangoSchema(query=Query)
+# schema = Schema(query=Query)
 schema = DjangoSchema(query=Query, automatic_preparation=True)
