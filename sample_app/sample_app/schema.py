@@ -31,17 +31,17 @@ class CommentReactionType(DjangoObjectType):
 
     is_from_bully = graphene.Boolean()
 
-    def resolve_is_from_bully(root, info):
-        profile_qs = Profile.objects.filter(pk=root.profile_id)
-        is_from_bully = annotate_is_bully(profile_qs).first().is_bully
+    # def resolve_is_from_bully(root, info):
+    #     profile_qs = Profile.objects.filter(pk=root.profile_id)
+    #     is_from_bully = annotate_is_bully(profile_qs).first().is_bully
 
-        return is_from_bully
+    #     return is_from_bully
 
-    # def annotate_is_from_bully(queryset, info):
-    #     profile_qs = Profile.objects.filter(pk=OuterRef('profile'))
-    #     is_from_bully = annotate_is_bully(profile_qs).values('is_bully')
+    def annotate_is_from_bully(root_queryset, info):
+        profile_qs = Profile.objects.filter(pk=OuterRef('profile'))
+        is_from_bully = annotate_is_bully(profile_qs).values('is_bully')
 
-    #     return queryset.annotate(is_from_bully=Subquery(is_from_bully))
+        return root_queryset.annotate(is_from_bully=Subquery(is_from_bully))
 
 
 class Query(graphene.ObjectType):
@@ -55,5 +55,5 @@ class Query(graphene.ObjectType):
         return Post.objects.all()[offset:limit]
 
 
-schema = DjangoSchema(query=Query)
-# schema = DjangoSchema(query=Query, automatic_preparation=True)
+# schema = DjangoSchema(query=Query)
+schema = DjangoSchema(query=Query, automatic_preparation=True)
